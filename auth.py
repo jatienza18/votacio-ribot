@@ -11,16 +11,18 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 # This needs to be configured by the administrator for the actual domain deployment.
 CLIENT_SECRETS_FILE = "client_secret.json"
 
-# This should match the Authorized Redirect URI in Google Cloud Console
-# For Streamlit local dev (default port 8501)
-REDIRECT_URI = "http://localhost:8501" 
-
 # Define the scopes we need (just basic profile and email)
 SCOPES = [
-    "openid", 
-    "https://www.googleapis.com/auth/userinfo.email", 
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile"
 ]
+
+# Llegeix la URL dinàmicament o fa servir el valor local per defecte
+if "google_oauth" in st.secrets:
+    REDIRECT_URI = 'https://votacio-ribot.streamlit.app/'
+else:
+    REDIRECT_URI = 'http://localhost:8502/'
 
 def get_auth_flow():
     # Attempt to load from Streamlit Secrets first (Production)
