@@ -23,6 +23,17 @@ SCOPES = [
 ]
 
 def get_auth_flow():
+    # Attempt to load from Streamlit Secrets first (Production)
+    if "google_oauth" in st.secrets:
+        client_config = {"web": dict(st.secrets["google_oauth"])}
+        flow = Flow.from_client_config(
+            client_config,
+            scopes=SCOPES,
+            redirect_uri=REDIRECT_URI
+        )
+        return flow
+        
+    # Fallback to local file
     if not os.path.exists(CLIENT_SECRETS_FILE):
         return None
         
