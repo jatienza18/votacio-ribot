@@ -64,8 +64,15 @@ def login_button():
                 st.error("Introdueix un correu vàlid per simular.")
         return
 
-    # Generate the authorization URL
-    auth_url, _ = flow.authorization_url(prompt='consent')
+    # Generate the authorization URL just once and store the PKCE code verifier
+    if "auth_url" not in st.session_state:
+        auth_url, state = flow.authorization_url(prompt='consent')
+        st.session_state["auth_url"] = auth_url
+        # Save the PKCE code verifier so we can re-inject it after Google redirects back
+        if hasattr(flow, "code_verifier"):
+            st.session_state["code_verifier"] = flow.code_verifier
+    
+    auth_url = st.session_state["auth_url"]
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -93,6 +100,10 @@ def handle_oauth_callback():
         flow = get_auth_flow()
         if flow:
             try:
+                # Re-inject the PKCE code verifier from before the redirect
+                if "code_verifier" in st.session_state:
+                    flow.code_verifier = st.session_state["code_verifier"]
+                
                 # Exchange the authorization code for access tokens
                 flow.fetch_token(code=code)
                 credentials = flow.credentials
