@@ -69,16 +69,18 @@ def login_button():
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown(f'''
-            <a href="{auth_url}" target="_top" style="text-decoration: none;">
-                <div style="background-color: #4285F4; color: white; padding: 12px; border-radius: 4px; text-align: center; font-weight: bold; font-family: sans-serif; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                    🔑 Inicia sessió amb Google
-                </div>
-            </a>
-            <p style="text-align: center; color: #666; font-size: 0.8em; margin-top: 10px;">
+        st.link_button(
+            "🔑 Inicia sessió amb Google",
+            url=auth_url,
+            use_container_width=True,
+            type="primary"
+        )
+        st.markdown(
+            """<p style="text-align: center; color: #666; font-size: 0.8em; margin-top: 10px;">
                 Només s'admeten comptes corporatius autoritzats.
-            </p>
-        ''', unsafe_allow_html=True)
+            </p>""", 
+            unsafe_allow_html=True
+        )
 
 def handle_oauth_callback():
     """Check if the user is returning from Google Auth with a code"""
