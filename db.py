@@ -115,13 +115,20 @@ def get_census():
         has_voted = email in voted_emails
         timestamp = voted_emails.get(email) if has_voted else None
         
+        # Check eligibility
+        roles = data.get("rols", [])
+        is_eligible = "DIRECCIO" not in [r.upper() for r in roles]
+        
         census.append({
             "email": email,
             "nom": nom_complet,
             "has_voted": has_voted,
-            "timestamp": timestamp
+            "timestamp": timestamp,
+            "is_eligible": is_eligible
         })
         
+    return sorted(census, key=lambda x: x["nom"])
+
 def reset_voting():
     # Delete all who_voted
     who_voted_docs = db.collection("who_voted").stream()

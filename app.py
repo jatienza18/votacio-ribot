@@ -157,8 +157,9 @@ def show_admin_panel():
         # Format Dataframe for better reading
         if not df.empty:
             df["Estat"] = df["has_voted"].apply(lambda x: "✅ Ha Votat" if x else "❌ Pendent")
-            df = df[["nom", "email", "Estat", "timestamp"]]
-            df.columns = ["Nom", "Correu Electrònic", "Estat", "Hora del Vot"]
+            df["Rol"] = df["is_eligible"].apply(lambda x: "🗳️ Elegible" if x else "👁️ Només Votant")
+            df = df[["nom", "email", "Rol", "Estat", "timestamp"]]
+            df.columns = ["Nom", "Correu Electrònic", "Condició", "Estat de Vot", "Hora"]
             st.dataframe(df, use_container_width=True, hide_index=True)
         else:
             st.info("No s'ha trobat informació del cens.")
