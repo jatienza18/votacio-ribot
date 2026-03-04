@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import requests as std_requests
 from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -106,7 +107,7 @@ def handle_oauth_callback():
                     "grant_type": "authorization_code",
                 }
                 
-                response = requests.post(token_url, data=data)
+                response = std_requests.post(token_url, data=data)
                 token_data = response.json()
                 
                 if "error" in token_data:
