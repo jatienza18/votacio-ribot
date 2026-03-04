@@ -32,12 +32,16 @@ def main():
             
     st.divider()
 
-    # Is Admin?
-    is_admin = user_email in ["admin@insestatut.cat", "director@insestatut.cat", "jan", "jatienza.prof@ribotiserra.cat"] # Configurable
+    # Admin Access via Password (Always visible in sidebar)
+    with st.sidebar:
+        st.subheader("🔒 Administració")
+        admin_pwd = st.text_input("Contrasenya d'escrutador:", type="password")
+        
+    is_admin = admin_pwd == st.secrets.get("admin_password", "claustre2026")
+    
     if is_admin:
-        if st.sidebar.checkbox("🔒 Panell d'Administració"):
-            show_admin_panel()
-            return
+        show_admin_panel()
+        return
             
     # Check Whitelist (Is Active Professor?)
     if not db.is_authorized_voter(user_email) and not is_admin:
@@ -102,7 +106,7 @@ def main():
 def show_admin_panel():
     st.title("Tauler d'Administració")
     
-    tab_conf, tab_cens, tab_res = st.tabs(["⚙️ Configuració", "👥 Cens de Votants", "📊 Resultats En Viu"])
+    tab_conf, tab_cens, tab_res = st.tabs(["⚙️ Control i QR", "👥 Cens de Votants", "📊 Resultats En Viu"])
     
     with tab_conf:
         st.subheader("Control d'obertura")
@@ -119,6 +123,20 @@ def show_admin_panel():
             if st.button("✅ Obrir Votacions", type="primary"):
                 db.set_voting_status(True)
                 st.rerun()
+                
+        st.divider()
+        st.subheader("📱 Codi QR d'Accés Ràpid")
+        app_url = "https://votacio-ribot.streamlit.app/"
+        qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={app_url}"
+        st.image(qr_url, caption="Escaneja per votar")
+        st.code(app_url)
+        
+        st.divider()
+        st.subheader("⚠️ Zona de Perill")
+        if st.button("🧨 Reiniciar Votació (Esborrar tot)"):
+            db.reset_voting()
+            st.success("Tots els vots i estats de participació han estat esborrats. Es pot tornar a començar.")
+            st.rerun()
                 
     with tab_cens:
         st.subheader("Control de Participació")

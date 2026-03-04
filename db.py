@@ -122,5 +122,13 @@ def get_census():
             "timestamp": timestamp
         })
         
-    # Sort by name
-    return sorted(census, key=lambda x: x["nom"])
+def reset_voting():
+    # Delete all who_voted
+    who_voted_docs = db.collection("who_voted").stream()
+    for doc in who_voted_docs:
+        doc.reference.delete()
+        
+    # Delete all voting_ballots
+    ballot_docs = db.collection("voting_ballots").stream()
+    for doc in ballot_docs:
+        doc.reference.delete()
