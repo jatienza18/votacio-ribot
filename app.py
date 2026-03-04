@@ -8,7 +8,6 @@ st.set_page_config(page_title="Eleccions Consell Escolar - Claustre", page_icon=
 handle_oauth_callback()
 
 def main():
-    st.image("logo.png", width=300)
     st.title("🗳️ Portal de votació del claustre")
     
     # 1. NOT LOGGED IN
