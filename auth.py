@@ -65,9 +65,12 @@ def login_button():
                 st.error("Introdueix un correu vàlid per simular.")
         return
 
-    # Generate the authorization URL with state, forcing it *not* to use PKCE
-    # by using kwargs or trusting the default implicit grant behavior.
-    auth_url, _ = flow.authorization_url(prompt='consent', include_granted_scopes='true')
+    # Generate the authorization URL
+    auth_url, state = flow.authorization_url(prompt='consent', include_granted_scopes='true')
+    
+    # Embed the PKCE code_verifier into the state parameter since session_state is lost on redirect
+    if hasattr(flow, "code_verifier") and flow.code_verifier:
+        auth_url = auth_url.replace(f"state={state}", f"state={state}-pkce-{flow.code_verifier}")
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -106,6 +109,11 @@ def handle_oauth_callback():
                     "redirect_uri": flow.redirect_uri,
                     "grant_type": "authorization_code",
                 }
+                
+                # Extract the code_verifier from the state parameter
+                state = query_params.get("state", "")
+                if "-pkce-" in state:
+                    data["code_verifier"] = state.split("-pkce-")[1]
                 
                 response = std_requests.post(token_url, data=data)
                 token_data = response.json()
