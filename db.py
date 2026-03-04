@@ -84,3 +84,43 @@ def get_voting_results():
             counts[v] = counts.get(v, 0) + 1
             
     return counts, total_ballots
+
+def get_voting_status():
+    doc = db.collection("settings").document("voting_config").get()
+    if doc.exists:
+        return doc.to_dict().get("is_open", False)
+    return False
+
+def set_voting_status(is_open: bool):
+    db.collection("settings").document("voting_config").set({
+        "is_open": is_open
+    }, merge=True)
+
+def get_census():
+    # Fetch all active professors
+    professors_docs = db.collection("professors").where("actiu", "==", True).stream()
+    census = []
+    
+    # Fetch all users who voted
+    voted_docs = db.collection("who_voted").stream()
+    voted_emails = {d.id: d.to_dict().get("timestamp") for d in voted_docs}
+    
+    for doc in professors_docs:
+        data = doc.to_dict()
+        email = data.get("email", doc.id)
+        nom_complet = f"{data.get('nom', '')} {data.get('cognoms', '')}".strip()
+        if not nom_complet:
+            nom_complet = email
+            
+        has_voted = email in voted_emails
+        timestamp = voted_emails.get(email) if has_voted else None
+        
+        census.append({
+            "email": email,
+            "nom": nom_complet,
+            "has_voted": has_voted,
+            "timestamp": timestamp
+        })
+        
+    # Sort by name
+    return sorted(census, key=lambda x: x["nom"])
