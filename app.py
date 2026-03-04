@@ -33,7 +33,7 @@ def main():
     st.divider()
 
     # Is Admin?
-    is_admin = user_email in ["admin@insestatut.cat", "director@insestatut.cat", "jan"] # Configurable
+    is_admin = user_email in ["admin@insestatut.cat", "director@insestatut.cat", "jan", "jatienza.prof@ribotiserra.cat"] # Configurable
     if is_admin:
         if st.sidebar.checkbox("🔒 Panell d'Administració"):
             show_admin_panel()
