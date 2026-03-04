@@ -8,7 +8,7 @@ st.set_page_config(page_title="Eleccions Consell Escolar - Claustre", page_icon=
 handle_oauth_callback()
 
 def main():
-    st.image("https://agora.xtec.cat/insestatut/wp-content/uploads/usu1516/2019/02/logo_cap_RIS_3-1.png", width=300)
+    st.image("logo.png", width=300)
     st.title("🗳️ Portal de votació del claustre")
     
     # 1. NOT LOGGED IN

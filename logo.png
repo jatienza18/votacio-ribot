@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error d'accés a Àgora</title>
+    <style>
+        /* Minimalistic CSS styles for the structure without final aesthetics */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header, footer {
+            text-align: center;
+        }
+
+        header img, footer img {
+            margin: 8px 16px;
+            height: 31px;
+        }
+
+        header {
+            border-bottom: 2px solid #FF494E;
+        }
+
+        footer {
+            border-top: 1px solid #FF494E;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #d9534f;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.5em;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <p>
+            <img src="portal/images/logo_defp.png" alt="">
+            <img src="portal/images/top_eix_color.png" alt="">
+        </p>
+    </header>
+
+    <div class="container">
+        <h1>No s'ha pogut accedir a la pàgina sol·licitada</h1>
+        <p>No s&#039;ha trobat el lloc web</p>
+    </div>
+
+    <footer>
+        <p>
+            <img src="portal/images/logo_defp.png" alt="">
+            <img src="portal/images/xtec.png" alt="">
+            <img src="portal/images/top_eix_color.png" alt="">
+        </p>
+    </footer>
+</body>
+</html>

@@ -50,7 +50,7 @@ def login_button():
     flow = get_auth_flow()
     
     if flow is None:
-        st.warning("⚠️ Configuració OAuth no trobada (client_secret.json falta).")
+        st.warning("⚠️ Configuració OAuth no trobada.")
         st.info("Per a proves locals sense Google Auth, usa l'entrada manual a continuació.")
         
         # MOCK LOGIN FOR DEVELOPMENT
@@ -64,15 +64,9 @@ def login_button():
                 st.error("Introdueix un correu vàlid per simular.")
         return
 
-    # Generate the authorization URL just once and store the PKCE code verifier
-    if "auth_url" not in st.session_state:
-        auth_url, state = flow.authorization_url(prompt='consent')
-        st.session_state["auth_url"] = auth_url
-        # Save the PKCE code verifier so we can re-inject it after Google redirects back
-        if hasattr(flow, "code_verifier"):
-            st.session_state["code_verifier"] = flow.code_verifier
-    
-    auth_url = st.session_state["auth_url"]
+    # Generate the authorization URL with state, forcing it *not* to use PKCE
+    # by using kwargs or trusting the default implicit grant behavior.
+    auth_url, _ = flow.authorization_url(prompt='consent', include_granted_scopes='true')
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -100,18 +94,31 @@ def handle_oauth_callback():
         flow = get_auth_flow()
         if flow:
             try:
-                # Re-inject the PKCE code verifier from before the redirect
-                if "code_verifier" in st.session_state:
-                    flow.code_verifier = st.session_state["code_verifier"]
+                # Exchange the authorization code for access tokens manually to bypass PKCE
+                client_config = flow.client_config
+                token_url = client_config["token_uri"]
                 
-                # Exchange the authorization code for access tokens
-                flow.fetch_token(code=code)
-                credentials = flow.credentials
+                data = {
+                    "code": code,
+                    "client_id": client_config["client_id"],
+                    "client_secret": client_config["client_secret"],
+                    "redirect_uri": flow.redirect_uri,
+                    "grant_type": "authorization_code",
+                }
+                
+                response = requests.post(token_url, data=data)
+                token_data = response.json()
+                
+                if "error" in token_data:
+                    st.error(f"Error d'autenticació: {token_data['error']} - {token_data.get('error_description', '')}")
+                    return
+                    
+                id_token_jwt = token_data.get("id_token")
                 
                 # Verify the ID token and get user info
                 request = requests.Request()
                 user_info = id_token.verify_oauth2_token(
-                    credentials.id_token, request, flow.client_config["client_id"]
+                    id_token_jwt, request, flow.client_config["client_id"]
                 )
                 
                 # Store user info in session state
