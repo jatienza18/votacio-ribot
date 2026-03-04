@@ -32,10 +32,11 @@ def main():
             
     st.divider()
 
-    # Admin Access via Password (Always visible in sidebar)
-    with st.sidebar:
-        st.subheader("🔒 Administració")
-        admin_pwd = st.text_input("Contrasenya d'escrutador:", type="password")
+    # Admin Access via Password (Expander below header)
+    with st.expander("🔒 Accés Administració"):
+        col_pwd, col_empty = st.columns([1, 1])
+        with col_pwd:
+            admin_pwd = st.text_input("Contrasenya d'escrutador:", type="password")
         
     is_admin = admin_pwd == st.secrets.get("admin_password", "claustre2026")
     
