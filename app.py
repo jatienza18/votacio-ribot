@@ -10,7 +10,20 @@ handle_oauth_callback()
 def main():
     st.title("🗳️ Portal de votació del claustre")
     
-    # 1. NOT LOGGED IN
+    # 1. ADMIN PANEL (Bypass login entirely)
+    # Admin Access via Password (Expander below header)
+    with st.expander("🔒 Accés Administració"):
+        col_pwd, col_empty = st.columns([1, 1])
+        with col_pwd:
+            admin_pwd = st.text_input("Contrasenya d'escrutador:", type="password")
+        
+    is_admin_override = admin_pwd == st.secrets.get("admin_password", "claustre2026")
+    
+    if is_admin_override:
+        show_admin_panel()
+        return
+
+    # 2. NOT LOGGED IN
     if "user_email" not in st.session_state:
         st.write("Benvingut/da al portal de votació del claustre.")
         st.write("Per garantir un procés de votació just i secret, si us plau, **inicia sessió amb el teu correu de l'institut.**")
@@ -18,7 +31,7 @@ def main():
         login_button()
         return
 
-    # 2. LOGGED IN - Check if Voted
+    # 3. LOGGED IN - Check if Voted
     user_email = st.session_state["user_email"]
     user_name = st.session_state.get("user_name", user_email)
     
@@ -32,17 +45,8 @@ def main():
             
     st.divider()
 
-    # Admin Access via Password (Expander below header)
-    with st.expander("🔒 Accés Administració"):
-        col_pwd, col_empty = st.columns([1, 1])
-        with col_pwd:
-            admin_pwd = st.text_input("Contrasenya d'escrutador:", type="password")
-        
-    is_admin = admin_pwd == st.secrets.get("admin_password", "claustre2026")
-    
-    if is_admin:
-        show_admin_panel()
-        return
+    # Is Admin via Email? (Kept for fallback if needed, but not showing panel here anymore)
+    is_admin = user_email in ["admin@insestatut.cat", "director@insestatut.cat", "jan", "jatienza.prof@ribotiserra.cat"] # Configurable
             
     # Check Whitelist (Is Active Professor?)
     if not db.is_authorized_voter(user_email) and not is_admin:
